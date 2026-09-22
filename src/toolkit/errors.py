@@ -8,3 +8,15 @@ class CalculatorError(ToolkitError):
 
 class ConverterError(ToolkitError):
     pass
+
+
+class InvalidCharacterError(ToolkitError):
+    pass
+
+
+class InvalidSyntaxError(ToolkitError):
+    pass
+
+
+class EmptyExpressionError(ToolkitError):
+    pass
