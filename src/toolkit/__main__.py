@@ -1,20 +1,65 @@
-from src.power import power_function
-from src.constants import SAMPLE_CONSTANT
+import argparse
 
 
-def main() -> None:
-    """
-    Обязательнная составляющая программ, которые сдаются. Является точкой входа в приложение
-    :return: Данная функция ничего не возвращает
-    """
+def create_parser() -> argparse.ArgumentParser:
+    """Create the command-line argument parser."""
+    parser = argparse.ArgumentParser(
+        prog="toolkit",
+        description="Calculator and unit converter.",
+    )
 
-    target, degree = map(int, input("Введите два числа разделенные пробелом: ").split(" "))
+    subparsers = parser.add_subparsers(
+        dest="command",
+        required=True,
+    )
 
-    result = power_function(target=target, power=degree)
+    calc_parser = subparsers.add_parser(
+        "calc",
+        help="Evaluate an arithmetic expression.",
+    )
+    calc_parser.add_argument(
+        "expression",
+        help="Arithmetic expression to evaluate.",
+    )
 
-    print(result)
+    convert_parser = subparsers.add_parser(
+        "convert",
+        help="Convert a value between compatible units.",
+    )
+    convert_parser.add_argument(
+        "value",
+        type=float,
+        help="Value to convert.",
+    )
+    convert_parser.add_argument(
+        "--from",
+        dest="from_unit",
+        required=True,
+        help="Source unit.",
+    )
+    convert_parser.add_argument(
+        "--to",
+        dest="to_unit",
+        required=True,
+        help="Target unit.",
+    )
 
-    print(SAMPLE_CONSTANT)
+    return parser
+
+
+def main() -> int:
+    """Run the command-line application."""
+    parser = create_parser()
+    args = parser.parse_args()
+
+    if args.command == "calc":
+        print(args.expression)
+
+    elif args.command == "convert":
+        print(args.value, args.from_unit, args.to_unit)
+
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
