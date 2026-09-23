@@ -10,13 +10,17 @@ class ConverterError(ToolkitError):
     pass
 
 
-class InvalidCharacterError(ToolkitError):
+class InvalidCharacterError(CalculatorError):
     pass
 
 
-class InvalidSyntaxError(ToolkitError):
+class InvalidSyntaxError(CalculatorError):
     pass
 
 
-class EmptyExpressionError(ToolkitError):
+class EmptyExpressionError(CalculatorError):
+    pass
+
+
+class MissingOperatorError(CalculatorError):
     pass
