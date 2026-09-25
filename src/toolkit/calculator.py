@@ -1,7 +1,8 @@
 from toolkit.errors import (InvalidCharacterError,
                             InvalidSyntaxError,
                             EmptyExpressionError,
-                            MissingOperatorError)
+                            MissingOperatorError,
+                            DivisionByZeroError)
 
 def is_number(expression: str) -> bool:
     try:
@@ -42,7 +43,7 @@ def tokenize(expression: str) -> list[str]:
                 i += 1
 
                 if i == len(expression) or (not expression[i].isdigit()):
-                    raise InvalidSyntaxError("number is expected after dot")
+                    raise InvalidSyntaxError("digits are expected after dot")
 
                 while i < len(expression) and expression[i].isdigit():
                     i += 1
@@ -55,7 +56,7 @@ def tokenize(expression: str) -> list[str]:
             tokens.append(char)
             continue
 
-        raise InvalidCharacterError(f"invalid character: {char}")
+        raise InvalidCharacterError(f"invalid character: '{char}'")
 
     if not tokens:
         raise EmptyExpressionError("expression is empty")
@@ -213,3 +214,46 @@ def infix_to_rpn(tokens: list[str]) -> list[str]:
         output.append(operators.pop())
 
     return output
+
+def evaluate_rpn(rpn: list[str]) -> float  :
+    stack: list[float] = []
+
+    for token in rpn:
+
+        if is_number(token):
+            stack.append(float(token))
+            continue
+
+        b = stack.pop()
+
+        if token not in ["u-", "u+"]:
+            a = stack.pop()
+
+        if token in ["/", "//", "%"] and b == 0:
+            raise DivisionByZeroError("division by zero")
+
+        match token:
+            case "*":
+                stack.append(a * b)
+            case "+":
+                stack.append(a + b)
+            case "-":
+                stack.append(a - b)
+            case "u-":
+                stack.append(-b)
+            case "/":
+                stack.append(a / b)
+            case "//":
+                stack.append(a // b)
+            case "%":
+                stack.append(a % b)
+            case _:
+                stack.append(b)
+
+    return stack.pop()
+
+def calculate(expression: str) -> float:
+    tokens = tokenize(expression)
+    validate(tokens)
+    rpn = infix_to_rpn(tokens)
+    return evaluate_rpn(rpn)

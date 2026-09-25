@@ -1,4 +1,8 @@
 import argparse
+import sys
+
+from toolkit.calculator import calculate
+from toolkit.errors import CalculatorError
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -19,6 +23,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
     calc_parser.add_argument(
         "expression",
+        type=str,
         help="Arithmetic expression to evaluate.",
     )
 
@@ -34,18 +39,25 @@ def create_parser() -> argparse.ArgumentParser:
     convert_parser.add_argument(
         "--from",
         dest="from_unit",
+        type=str,
         required=True,
         help="Source unit.",
     )
     convert_parser.add_argument(
         "--to",
         dest="to_unit",
+        type=str,
         required=True,
         help="Target unit.",
     )
 
     return parser
 
+def format_result(result: float) -> str:
+    if result.is_integer():
+        return str(int(result))
+
+    return str(result)
 
 def main() -> int:
     """Run the command-line application."""
@@ -53,7 +65,14 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.command == "calc":
-        print(args.expression)
+
+        try:
+            res = calculate(args.expression)
+        except CalculatorError as e:
+            print(f"Calculator error: {e}", file=sys.stderr)
+            return 2
+
+        print(format_result(res))
 
     elif args.command == "convert":
         print(args.value, args.from_unit, args.to_unit)

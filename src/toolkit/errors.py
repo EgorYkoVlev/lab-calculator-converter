@@ -21,5 +21,9 @@ class MissingOperatorError(CalculatorError):
     pass
 
 
+class DivisionByZeroError(CalculatorError):
+    pass
+
+
 class ConverterError(ToolkitError):
     pass
