@@ -5,11 +5,6 @@ class ToolkitError(Exception):
 class CalculatorError(ToolkitError):
     pass
 
-
-class ConverterError(ToolkitError):
-    pass
-
-
 class InvalidCharacterError(CalculatorError):
     pass
 
@@ -23,4 +18,8 @@ class EmptyExpressionError(CalculatorError):
 
 
 class MissingOperatorError(CalculatorError):
+    pass
+
+
+class ConverterError(ToolkitError):
     pass
