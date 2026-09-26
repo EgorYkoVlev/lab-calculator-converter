@@ -2,7 +2,8 @@ import argparse
 import sys
 
 from toolkit.calculator import calculate
-from toolkit.errors import CalculatorError
+from toolkit.converter import convert
+from toolkit.errors import CalculatorError, ConverterError
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -75,7 +76,14 @@ def main() -> int:
         print(format_result(res))
 
     elif args.command == "convert":
-        print(args.value, args.from_unit, args.to_unit)
+
+        try:
+            res = convert(args.value, args.from_unit, args.to_unit)
+        except ConverterError as e:
+            print(f"Converter error: {e}", file=sys.stderr)
+            return 2
+
+        print(res)
 
     return 0
 

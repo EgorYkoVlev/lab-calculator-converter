@@ -1,8 +1,12 @@
-from toolkit.errors import (InvalidCharacterError,
-                            InvalidSyntaxError,
-                            EmptyExpressionError,
-                            MissingOperatorError,
-                            DivisionByZeroError)
+from toolkit.constants import OPERATOR_PRECEDENCE
+from toolkit.errors import (
+    DivisionByZeroError,
+    EmptyExpressionError,
+    InvalidCharacterError,
+    InvalidSyntaxError,
+    MissingOperandError,
+    MissingOperatorError
+)
 
 def is_number(expression: str) -> bool:
     try:
@@ -75,19 +79,19 @@ def validate(tokens: list[str]) -> None:
 
             if token in ["+", "-"]:
 
-                if i < len(tokens) - 1 and is_number(tokens[i+1]):
+                if i < len(tokens) - 1 and is_number(tokens[i + 1]):
                     i += 1
                     continue
 
-                raise InvalidSyntaxError("invalid syntax")
+                raise MissingOperandError("missing operand")
 
             if token in ["*", "/", "%", "//"]:
-                raise InvalidSyntaxError("invalid syntax")
+                raise MissingOperandError("missing operand")
 
         if is_number(token):
 
             if i < len(tokens) - 1 and tokens[i + 1] == "(":
-                raise InvalidSyntaxError("invalid syntax")
+                raise MissingOperatorError("missing operator")
 
             if i < len(tokens) - 1 and is_number(tokens[i + 1]):
                 raise MissingOperatorError("missing operator")
@@ -98,26 +102,27 @@ def validate(tokens: list[str]) -> None:
         if token == "(":
             open_parentheses_count += 1
 
-            if i < len(tokens) - 1 and tokens[i + 1] in ["+", "-"]:
+            if (i < len(tokens) - 2
+                and tokens[i + 1] in ["+", "-"]
+                and is_number(tokens[i + 2])
+            ):
+                i += 2
+                continue
 
-                if i + 1 < len(tokens) - 1 and is_number(tokens[i+2]):
-                    i += 2
-                    continue
-
-            if i < len(tokens) - 1 and (tokens[i + 1] in "(" or is_number(tokens[i + 1])):
+            if i < len(tokens) - 1 and (tokens[i + 1] == "(" or is_number(tokens[i + 1])):
                 i += 1
                 continue
 
-            raise InvalidSyntaxError("invalid syntax")
+            raise MissingOperandError("missing operand")
 
         if token == ")":
             closing_parentheses_count += 1
 
             if closing_parentheses_count > open_parentheses_count:
-                raise InvalidSyntaxError("invalid syntax")
+                raise InvalidSyntaxError("opening parenthesis missing")
 
             if i < len(tokens) - 1 and (is_number(tokens[i + 1]) or tokens[i + 1] == "("):
-                raise InvalidSyntaxError("invalid syntax")
+                raise MissingOperatorError("missing operator")
 
             i += 1
             continue
@@ -125,15 +130,15 @@ def validate(tokens: list[str]) -> None:
         if token in ["*", "/", "%", "//", "+", "-"]:
 
             if i == len(tokens) - 1 or tokens[i + 1] in ["*", "/", "%", "//", ")"]:
-                raise InvalidSyntaxError("invalid syntax")
+                raise MissingOperandError("missing operand(s)")
 
             if i < len(tokens) - 2 and tokens[i + 1] in ["+", "-"] and (not is_number(tokens[i + 2])):
-                raise InvalidSyntaxError("invalid syntax")
+                raise MissingOperandError("missing operand")
 
             i += 1
             continue
     if closing_parentheses_count != open_parentheses_count:
-        raise InvalidSyntaxError("invalid syntax")
+        raise InvalidSyntaxError("closing parenthesis(es) missing")
 
 def convert_unary_operators(tokens: list[str]) -> list[str]:
     new_tokens: list[str] = tokens.copy()
@@ -142,13 +147,18 @@ def convert_unary_operators(tokens: list[str]) -> list[str]:
     while i < len(new_tokens):
         token = new_tokens[i]
 
-        if token in ["+", "-"]:
-
-            if i == 0 or new_tokens[i-1] == "(" or new_tokens[i-1] in ["*", "/", "%", "//", "+", "-"]:
-                new_tokens.insert(i+2, f"u{token}")
-                new_tokens.pop(i)
-                i += 2
-                continue
+        if (
+            token in ["+", "-"]
+            and (
+                i == 0
+                or new_tokens[i - 1] == "("
+                or new_tokens[i - 1] in ["*", "/", "%", "//", "+", "-"]
+            )
+        ):
+            new_tokens.insert(i+2, f"u{token}")
+            new_tokens.pop(i)
+            i += 2
+            continue
 
         i += 1
 
@@ -158,16 +168,6 @@ def infix_to_rpn(tokens: list[str]) -> list[str]:
     new_tokens: list[str] = convert_unary_operators(tokens)
     output: list[str] = []
     operators: list[str] = []
-    operator_precedence: dict[str, int] = {
-        "+":1,
-        "-":1,
-        "*":2,
-        "/":2,
-        "//":2,
-        "%":2,
-        "u-":3,
-        "u+":3
-    }
     i = 0
 
     while i < len(new_tokens):
@@ -179,14 +179,14 @@ def infix_to_rpn(tokens: list[str]) -> list[str]:
             continue
 
         if token in ["*", "/", "//", "%", "+", "-", "u-", "u+"]:
-            priorety = operator_precedence[token]
+            priority = OPERATOR_PRECEDENCE[token]
             j = len(operators) - 1
 
             while j > -1:
                 if operators[j] == "(":
                     break
 
-                if operator_precedence[operators[j]] > priorety:
+                if OPERATOR_PRECEDENCE[operators[j]] >= priority:
                     output.append(operators.pop(j))
                     j -= 1
                     continue
