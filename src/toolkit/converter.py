@@ -6,14 +6,15 @@ from toolkit.constants import (
     LENGTH_UNITS_COEFFICIENTS,
     TEMPERATURE_UNITS,
     WEIGHT_UNITS,
-    WEIGHT_UNITS_COEFFICIENTS
+    WEIGHT_UNITS_COEFFICIENTS,
 )
 from toolkit.errors import (
     BelowAbsoluteZeroError,
     IncompatibleUnitsError,
     InvalidValueError,
-    UnknownUnitError
+    UnknownUnitError,
 )
+
 
 def validate(value: float, from_unit: str, to_unit: str) -> None:
     units_list: list[set] = [LENGTH_UNITS, WEIGHT_UNITS, TEMPERATURE_UNITS]
@@ -37,13 +38,13 @@ def validate(value: float, from_unit: str, to_unit: str) -> None:
         match from_unit:
             case "c":
                 if value < ABSOLUTE_ZERO_CELSIUS:
-                    raise BelowAbsoluteZeroError("temperature value cannot be below absolute zero")
+                    raise BelowAbsoluteZeroError("below absolute zero")
             case "k":
                 if value < ABSOLUTE_ZERO_KELVIN:
-                    raise BelowAbsoluteZeroError("temperature value cannot be below absolute zero")
+                    raise BelowAbsoluteZeroError("below absolute zero")
             case "f":
                 if value < ABSOLUTE_ZERO_FAHRENHEIT:
-                    raise BelowAbsoluteZeroError("temperature value cannot be below absolute zero")
+                    raise BelowAbsoluteZeroError("below absolute zero")
 
 def convert(value: float, from_unit: str, to_unit: str) -> float:
     from_unit = from_unit.lower()

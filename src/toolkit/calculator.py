@@ -5,8 +5,9 @@ from toolkit.errors import (
     InvalidCharacterError,
     InvalidSyntaxError,
     MissingOperandError,
-    MissingOperatorError
+    MissingOperatorError,
 )
+
 
 def is_number(expression: str) -> bool:
     try:
@@ -109,7 +110,10 @@ def validate(tokens: list[str]) -> None:
                 i += 2
                 continue
 
-            if i < len(tokens) - 1 and (tokens[i + 1] == "(" or is_number(tokens[i + 1])):
+            if (
+                i < len(tokens) - 1
+                and (tokens[i + 1] == "(" or is_number(tokens[i + 1]))
+            ):
                 i += 1
                 continue
 
@@ -121,7 +125,10 @@ def validate(tokens: list[str]) -> None:
             if closing_parentheses_count > open_parentheses_count:
                 raise InvalidSyntaxError("opening parenthesis missing")
 
-            if i < len(tokens) - 1 and (is_number(tokens[i + 1]) or tokens[i + 1] == "("):
+            if (
+                i < len(tokens) - 1
+                and (is_number(tokens[i + 1]) or tokens[i + 1] == "(")
+            ):
                 raise MissingOperatorError("missing operator")
 
             i += 1
@@ -132,7 +139,11 @@ def validate(tokens: list[str]) -> None:
             if i == len(tokens) - 1 or tokens[i + 1] in ["*", "/", "%", "//", ")"]:
                 raise MissingOperandError("missing operand(s)")
 
-            if i < len(tokens) - 2 and tokens[i + 1] in ["+", "-"] and (not is_number(tokens[i + 2])):
+            if (
+                i < len(tokens) - 2
+                and tokens[i + 1] in ["+", "-"]
+                and (not is_number(tokens[i + 2]))
+            ):
                 raise MissingOperandError("missing operand")
 
             i += 1
