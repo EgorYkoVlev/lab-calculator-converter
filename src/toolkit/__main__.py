@@ -55,6 +55,7 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 def format_result(result: float) -> str:
+    """Format result if it has no fractional part and return a string."""
     if result.is_integer():
         return str(int(result))
 

@@ -17,6 +17,7 @@ from toolkit.errors import (
 
 
 def validate(value: float, from_unit: str, to_unit: str) -> None:
+    """Check the validity if the input arguments."""
     units_list: list[set] = [LENGTH_UNITS, WEIGHT_UNITS, TEMPERATURE_UNITS]
 
     source_unit_validate: bool = any(from_unit in i for i in units_list)
@@ -47,6 +48,7 @@ def validate(value: float, from_unit: str, to_unit: str) -> None:
                     raise BelowAbsoluteZeroError("below absolute zero")
 
 def convert(value: float, from_unit: str, to_unit: str) -> float:
+    """Convert the value between compatible units."""
     from_unit = from_unit.lower()
     to_unit = to_unit.lower()
 

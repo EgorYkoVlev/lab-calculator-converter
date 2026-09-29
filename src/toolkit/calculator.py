@@ -10,6 +10,7 @@ from toolkit.errors import (
 
 
 def is_number(expression: str) -> bool:
+    """Check if the expression is numeric."""
     try:
         float(expression)
         return True
@@ -17,6 +18,7 @@ def is_number(expression: str) -> bool:
         return False
 
 def tokenize(expression: str) -> list[str]:
+    """Break a string into a list of tokens."""
     tokens: list[str] = []
     i = 0
 
@@ -69,6 +71,7 @@ def tokenize(expression: str) -> list[str]:
     return tokens
 
 def validate(tokens: list[str]) -> None:
+    """Check if the expression is valid."""
     i = 0
     open_parentheses_count = 0
     closing_parentheses_count = 0
@@ -152,6 +155,7 @@ def validate(tokens: list[str]) -> None:
         raise InvalidSyntaxError("closing parenthesis(es) missing")
 
 def convert_unary_operators(tokens: list[str]) -> list[str]:
+    """Convert the unary operators into their equivalent for the RPN."""
     new_tokens: list[str] = tokens.copy()
     i = 0
 
@@ -176,6 +180,7 @@ def convert_unary_operators(tokens: list[str]) -> list[str]:
     return new_tokens
 
 def infix_to_rpn(tokens: list[str]) -> list[str]:
+    """Convert the infix notation into the RPN."""
     new_tokens: list[str] = convert_unary_operators(tokens)
     output: list[str] = []
     operators: list[str] = []
@@ -226,7 +231,8 @@ def infix_to_rpn(tokens: list[str]) -> list[str]:
 
     return output
 
-def evaluate_rpn(rpn: list[str]) -> float  :
+def evaluate_rpn(rpn: list[str]) -> float:
+    """Evaluate the RPN and return the result as a float."""
     stack: list[float] = []
 
     for token in rpn:
@@ -264,6 +270,7 @@ def evaluate_rpn(rpn: list[str]) -> float  :
     return stack.pop()
 
 def calculate(expression: str) -> float:
+    """Evaluate an arithmetic expression."""
     tokens = tokenize(expression)
     validate(tokens)
     rpn = infix_to_rpn(tokens)
